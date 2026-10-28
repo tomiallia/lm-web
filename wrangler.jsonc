@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Publica este repositorio en el Worker existente de LM.
+  "name": "lm-tiendadeco",
+  "compatibility_date": "2026-10-28",
+  "workers_dev": false,
+  "assets": {
+    // index.html e imágenes se sirven desde la carpeta principal.
+    "directory": "."
+  }
+}
