@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 680" fill="none">
+<!-- DECORACIÓN LM. Editá colores fill/stroke y coordenadas; sin fondo opaco.
+     El centro queda libre para el título. SVG escalable, no pierde calidad. -->
+<defs><g id="flor" stroke="#656153" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M0 0C-22-32-97-40-120-81C-143-122-108-142-78-123C-59-152-26-140-21-111C-13-74-12-30 0 0Z"/>
+  <path d="M0 0C-9-42-15-110 8-143C25-170 48-168 53-141C84-143 94-119 75-91C50-55 19-19 0 0Z"/>
+  <path d="M0 0C39-40 88-96 124-86C151-79 155-56 137-39C164-15 147 10 116 10C78 10 31 4 0 0Z"/>
+  <path d="M0 0C40 19 95 45 101 78C108 109 84 124 66 109C48 137 18 116 16 87C14 56 6 22 0 0Z"/>
+  <path d="M0 0C-29 22-57 72-89 73C-116 75-132 54-111 35C-139 16-123-8-93-11C-60-14-29-7 0 0Z"/>
+  <path d="M-7-15Q-56-70-88-101M-16-11Q-57-37-100-59M1-20Q8-79 28-122M10-14Q45-54 65-83M19-6Q83-48 121-56M20 3Q76-1 116-1M13 16Q47 53 70 89M3 24Q18 62 25 92M-18 8Q-59 27-91 48M-26-2Q-64-8-98 9"/>
+  <path d="M0 0L-8-25M0 0L0-29M0 0L9-24M0 0L15-17"/>
+  <ellipse cx="-8" cy="-27" rx="2.5" ry="5" fill="#656153"/><ellipse cy="-31" rx="2.5" ry="5" fill="#656153"/><ellipse cx="10" cy="-27" rx="2.5" ry="5" fill="#656153"/>
+</g></defs>
+<!-- Flores: cambiá translate, rotate y scale para moverlas. -->
+<use href="#flor" transform="translate(1306 177) rotate(24) scale(1.20)" opacity=".88"/>
+<use href="#flor" transform="translate(100 520) rotate(-20) scale(1.08)" opacity=".82"/>
+<!-- Ramas y hojas: oliva de la marca. -->
+<g fill="#66734a" fill-opacity=".85" stroke="#66734a" stroke-width="2">
+  <path d="M1446 645C1340 574 1327 448 1428 344M1446 645C1344 658 1268 654 1201 615" fill="none"/>
+  <path d="M1366 548C1295 530 1278 464 1284 439C1334 451 1366 500 1366 548Z"/>
+  <path d="M1374 474C1396 414 1446 401 1483 402C1466 451 1420 477 1374 474Z"/>
+  <path d="M1409 370C1375 357 1323 369 1296 394C1352 409 1390 388 1409 370Z"/>
+  <path d="M1267 644C1247 593 1201 575 1169 574C1180 617 1224 641 1267 644Z"/>
+  <!-- Rama izquierda: bajada 45 px para separarla de los óvalos cálidos.
+       Editá este translate para mover sólo la ramita, nunca los óvalos. -->
+  <g transform="translate(0 45)">
+    <path d="M-8 336C48 289 63 240 60 211" fill="none"/>
+    <path d="M31 293C30 251 3 226-18 223C-20 257 1 285 31 293Z"/>
+    <path d="M57 248C91 240 111 216 113 193C80 196 59 221 57 248Z"/>
+  </g>
+</g></svg>

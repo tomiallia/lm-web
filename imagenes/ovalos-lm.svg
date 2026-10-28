@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 190" fill="none">
+<!-- FIGURA INDEPENDIENTE. Los dos óvalos se mueven juntos desde .hero-ovals.
+     Cambiá fill para su color y fill-opacity para su intensidad. -->
+<ellipse cx="65" cy="83" rx="48" ry="82" transform="rotate(31 65 83)" fill="#d49c62" fill-opacity=".58"/>
+<ellipse cx="128" cy="106" rx="37" ry="66" transform="rotate(31 128 106)" fill="#b66e49" fill-opacity=".56"/>
+</svg>
