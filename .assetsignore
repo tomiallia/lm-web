@@ -1,0 +1,11 @@
+# Archivos internos: no se publican como parte de la web.
+.git
+.git/**
+.github
+.github/**
+.wrangler
+.wrangler/**
+node_modules
+node_modules/**
+wrangler.jsonc
+.assetsignore
