@@ -439,6 +439,24 @@ h1, h2, h3, button, a {
     .gallery-arrow:hover { background: var(--oliva); color: var(--crema); }
     .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
     .gallery-position { position: absolute; left: 12px; bottom: 12px; padding: 3px 9px; background: rgba(249,247,239,.94); color: var(--oliva); border-radius: 12px; font-size: .75rem; pointer-events: none; }
+  /* CYBERMONDAY — cinta de beneficios y financiación. Sin cambios de precios base.
+       La animación se pausa al pasar el cursor y respeta movimiento reducido. */
+    .cyber-banner { padding: 0; overflow: hidden; background: var(--cyber); color: #fff8ed; }
+    .cyber-track { display: flex; width: max-content; animation: cyber-scroll 28s linear infinite; }
+    .cyber-group { display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; min-width: 100vw; gap: 40px; padding: 12px 28px; box-sizing: border-box; }
+    .cyber-group span { white-space: nowrap; font-size: .82rem; font-weight: 600; letter-spacing: .08em; }
+    .cyber-group span:first-child { font-weight: 800; letter-spacing: .15em; }
+    .cyber-star { opacity: .65; }
+    .cyber-banner:hover .cyber-track { animation-play-state: paused; }
+    /* Cuenta regresiva: números de ancho fijo para evitar saltos al actualizar. */
+    .cyber-validity { font-size: .8rem; color: var(--cyber); font-variant-numeric: tabular-nums; font-weight: 600; }
+    [data-cyber-countdown] { font-variant-numeric: tabular-nums; }
+    #cash-price.cyber-cash { color: var(--cyber); font-weight: 650; font-size: .9rem; }
+    .installment-before { text-decoration: line-through; color: #77766b; font-size: .8rem; }
+    #installment-price.cyber-installment { color: var(--cyber); font-weight: 750; font-size: 1.08rem; }
+    @keyframes cyber-scroll { to { transform: translateX(-50%); } }
+    @media(max-width:600px){ .cyber-group { gap: 24px; padding: 11px 20px; } .cyber-group span { font-size: .74rem; } }
+    @media(prefers-reduced-motion:reduce){ .cyber-track { animation:none; width:100%; } .cyber-group { min-width:0; width:100%; flex-wrap:wrap; gap:8px 14px; } .cyber-group[aria-hidden],.cyber-star { display:none; } }
   </style>
 </head>
 <body>
@@ -509,7 +527,7 @@ h1, h2, h3, button, a {
 <span id="gallery-position" class="gallery-position" role="status" aria-live="polite" hidden></span>
 </div><div class="thumbs" id="thumbnails" aria-label="Fotografías del producto"></div><p class="photo-note" id="photo-note"></p></div>
         <div class="configuration">
-          <div class="product-heading"><p class="eyebrow" id="product-category"></p><h1 id="product-title" tabindex="-1"></h1><p class="intro" id="product-intro"></p><p id="old-price" class="old-price" hidden></p><p id="price" class="price" aria-live="polite"></p><div id="payment-options" class="payment-options" aria-live="polite" hidden><p id="installment-price"></p><p id="cash-price"></p></div><p id="price-caption" class="price-caption"></p></div>
+          <div class="product-heading"><p class="eyebrow" id="product-category"></p><h1 id="product-title" tabindex="-1"></h1><p class="intro" id="product-intro"></p><p id="old-price" class="old-price" hidden></p><p id="price" class="price" aria-live="polite"></p><div id="payment-options" class="payment-options" aria-live="polite" hidden><p id="installment-before" class="installment-before" hidden></p><p id="installment-price"></p><p id="cyber-validity" class="cyber-validity" role="timer" aria-live="off" hidden></p><p id="cash-price"></p></div><p id="price-caption" class="price-caption"></p></div>
           <fieldset><legend id="sizes-label"></legend><div id="sizes" class="choices"></div><!-- Los campos se dibujan desde MEDIDAS_PERSONALIZADAS; se ocultan al elegir una medida estándar. --><div id="custom-measure" class="custom-measure" hidden></div></fieldset>
           <fieldset><legend id="fabrics-label"></legend><div id="fabrics" class="choices"></div></fieldset>
           <fieldset><legend id="colors-label"></legend><p id="color-status" class="color-status"></p><div id="swatches" class="swatch-grid"></div><button id="view-samples" class="text-link" type="button" hidden></button><p id="sample-note" class="sample-note"></p></fieldset>
@@ -658,6 +676,37 @@ const MEDIDAS_PERSONALIZADAS = {
 */
 const GALERIA = { flechas: { enabled: true }, deslizar: { enabled: true } };
 
+// CYBERMONDAY: cambiar enabled a false restaura las 6 cuotas y el anuncio habitual.
+// Color, textos y cantidad de cuotas se modifican únicamente aquí.
+const CYBERMONDAY = {
+  enabled: true,
+  cuotas: 18,
+  // Jueves a las 00:00 de Argentina: ya terminó todo el miércoles.
+  fin: "2026-11-05T00:00:00-03:00",
+  contadorTexto: "Termina en", // Texto que acompaña la cuenta regresiva.
+  color: "#a43743", // Borgoña: acompaña al crema y al verde de LM.
+  mensajes: ["CYBERMONDAY", "18 cuotas sin interés", "30% OFF en efectivo o transferencia"]
+};
+// Desactiva las 18 cuotas al llegar la fecha, conservando los pagos habituales.
+function cyberActivo(ahora=Date.now()) {
+  return CYBERMONDAY.enabled && ahora < Date.parse(CYBERMONDAY.fin);
+}
+// Se actualiza cada segundo. El fin usa el huso horario de Argentina.
+function textoCuentaCyber(ahora=Date.now()) {
+  const segundos=Math.max(0,Math.floor((Date.parse(CYBERMONDAY.fin)-ahora)/1000));
+  const dias=Math.floor(segundos/86400);
+  const horas=Math.floor(segundos%86400/3600);
+  const minutos=Math.floor(segundos%3600/60);
+  const resto=segundos%60;
+  const dos=n=>String(n).padStart(2,"0");
+  return CYBERMONDAY.contadorTexto+" "+(dias ? dias+"d · " : "")+dos(horas)+"h : "+dos(minutos)+"m : "+dos(resto)+"s";
+}
+function actualizarCuentaCyber() {
+  const textoContador=textoCuentaCyber();
+  document.querySelectorAll("[data-cyber-countdown]").forEach(n=>{n.textContent=textoContador;});
+  const ficha=document.getElementById("cyber-validity");
+  if(ficha && !ficha.hidden)ficha.textContent=textoContador;
+}
 const PAGOS = {
   cuotas: { enabled: true, cantidad: 6, texto: "sin interés" },
   contado: { enabled: true, porcentaje: 30, texto: "abonando en efectivo o transferencia" }
@@ -5528,6 +5577,13 @@ function iniciarSitio() {
   $("logo").src = rutaSegura(MARCA.logo);
   $("logo").alt = "Logo " + MARCA.nombre;
   texto("anuncio", INICIO.anuncio); $("anuncio").hidden = !SECCIONES.anuncio;
+  if(cyberActivo()){
+    document.documentElement.style.setProperty("--cyber",CYBERMONDAY.color);
+    const anuncio=$("anuncio"); anuncio.hidden=false; anuncio.classList.add("cyber-banner");
+    // Dos grupos idénticos hacen que la cinta avance sin saltos. Solo uno es accesible.
+    const grupo=CYBERMONDAY.mensajes.map(m=>'<span>'+escapar(m)+'</span><span class="cyber-star" aria-hidden="true">✦</span>').join('')+'<span data-cyber-countdown role="timer" aria-live="off">'+escapar(textoCuentaCyber())+'</span><span class="cyber-star" aria-hidden="true">✦</span>';
+    anuncio.innerHTML='<div class="cyber-track"><div class="cyber-group">'+grupo+'</div><div class="cyber-group" aria-hidden="true">'+grupo+'</div></div>';
+  }
   texto("hero-eyebrow", INICIO.etiqueta);
   $("hero-title").innerHTML = escapar(INICIO.titulo) + "<br><em>" + escapar(INICIO.tituloCursiva) + "</em>";
   texto("hero-text", INICIO.descripcion);
@@ -5690,7 +5746,12 @@ function navegar() {
     window.scrollTo(0,0); $("catalog-title").focus({preventScroll:true}); return;
   }
   $("home-view").hidden=false; document.title=tituloOriginal;
-  const destino=$(hash || "inicio");
+  // Inicio siempre incluye la franja y el logo; no desplazar hasta la sección hero.
+  if (!hash || hash === "inicio") {
+    requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));
+    return;
+  }
+  const destino=$(hash);
   if (destino && !destino.hidden && destino.closest('#home-view')) requestAnimationFrame(()=>destino.scrollIntoView({behavior:'instant',block:'start'}));
   else window.scrollTo(0,0);
 }
@@ -5816,7 +5877,7 @@ function opcionesPago(seleccion) {
   const precio=seleccion.precioNumerico;
   if(!precioValido(precio))return {cuotas:'',contado:''};
   const desde=seleccion.desde ? 'Desde ' : '';
-  const q=PAGOS.cuotas,d=PAGOS.contado;
+  const q={...PAGOS.cuotas,cantidad:cyberActivo() ? CYBERMONDAY.cuotas : PAGOS.cuotas.cantidad},d=PAGOS.contado;
   return {
     cuotas:q.enabled && Number.isInteger(q.cantidad) && q.cantidad>0 ? desde+q.cantidad+' × '+dineroPago(precio/q.cantidad)+' '+q.texto : '',
     contado:d.enabled && Number.isFinite(d.porcentaje) && d.porcentaje>0 && d.porcentaje<100 ? d.porcentaje+'% OFF '+d.texto+' · '+desde+dineroPago(precio*(1-d.porcentaje/100)) : ''
@@ -5826,6 +5887,15 @@ function actualizarResumen() {
   const s = seleccionActual(); texto("price",s.precio);
   const pagos=opcionesPago(s);
   texto("installment-price",pagos.cuotas);texto("cash-price",pagos.contado);
+  // El beneficio habitual se tacha; el importe vigente siempre se calcula con 18 cuotas.
+  const vigencia=$("cyber-validity");
+  vigencia.hidden=!cyberActivo() || !pagos.cuotas;
+  vigencia.textContent=vigencia.hidden ? "" : textoCuentaCyber();
+  const anterior=$("installment-before");
+  anterior.hidden=!cyberActivo() || !pagos.cuotas;
+  anterior.textContent=anterior.hidden ? "" : PAGOS.cuotas.cantidad+" cuotas sin interés";
+  $("installment-price").classList.toggle("cyber-installment",cyberActivo());
+  $("cash-price").classList.toggle("cyber-cash",cyberActivo());
   $("installment-price").hidden=!pagos.cuotas;$("cash-price").hidden=!pagos.contado;
   $("payment-options").hidden=!pagos.cuotas && !pagos.contado;
   $("old-price").hidden = s.anterior === null;
@@ -6044,6 +6114,14 @@ if (document.modelContext?.registerTool) {
   } catch { /* Soporte opcional: la web continúa funcionando. */ }
 }
 
+
+// Actualiza la cinta y la ficha; al vencer, restaura el sitio incluso si quedó abierto.
+if(cyberActivo()) {
+  const controlCyber=setInterval(()=>{
+    if(!cyberActivo()){ clearInterval(controlCyber); location.reload(); return; }
+    actualizarCuentaCyber();
+  },1000);
+}
 </script>
 </body>
 </html>
