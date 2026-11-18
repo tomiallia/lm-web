@@ -439,24 +439,19 @@ h1, h2, h3, button, a {
     .gallery-arrow:hover { background: var(--oliva); color: var(--crema); }
     .gallery-prev { left: 10px; } .gallery-next { right: 10px; }
     .gallery-position { position: absolute; left: 12px; bottom: 12px; padding: 3px 9px; background: rgba(249,247,239,.94); color: var(--oliva); border-radius: 12px; font-size: .75rem; pointer-events: none; }
-  /* CYBERMONDAY — cinta de beneficios y financiación. Sin cambios de precios base.
-       La animación se pausa al pasar el cursor y respeta movimiento reducido. */
-    .cyber-banner { padding: 0; overflow: hidden; background: var(--cyber); color: #fff8ed; }
-    .cyber-track { display: flex; width: max-content; animation: cyber-scroll 28s linear infinite; }
-    .cyber-group { display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; min-width: 100vw; gap: 40px; padding: 12px 28px; box-sizing: border-box; }
-    .cyber-group span { white-space: nowrap; font-size: .82rem; font-weight: 600; letter-spacing: .08em; }
-    .cyber-group span:first-child { font-weight: 800; letter-spacing: .15em; }
-    .cyber-star { opacity: .65; }
-    .cyber-banner:hover .cyber-track { animation-play-state: paused; }
-    /* Cuenta regresiva: números de ancho fijo para evitar saltos al actualizar. */
-    .cyber-validity { font-size: .8rem; color: var(--cyber); font-variant-numeric: tabular-nums; font-weight: 600; }
-    [data-cyber-countdown] { font-variant-numeric: tabular-nums; }
-    #cash-price.cyber-cash { color: var(--cyber); font-weight: 650; font-size: .9rem; }
-    .installment-before { text-decoration: line-through; color: #77766b; font-size: .8rem; }
-    #installment-price.cyber-installment { color: var(--cyber); font-weight: 750; font-size: 1.08rem; }
-    @keyframes cyber-scroll { to { transform: translateX(-50%); } }
-    @media(max-width:600px){ .cyber-group { gap: 24px; padding: 11px 20px; } .cyber-group span { font-size: .74rem; } }
-    @media(prefers-reduced-motion:reduce){ .cyber-track { animation:none; width:100%; } .cyber-group { min-width:0; width:100%; flex-wrap:wrap; gap:8px 14px; } .cyber-group[aria-hidden],.cyber-star { display:none; } }
+  /* BARRA DE BENEFICIOS: mensajes editables en BARRA_BENEFICIOS. */
+    .benefits-banner { padding:0; overflow:hidden; background:var(--oliva); color:var(--crema); }
+    .benefits-track { display:flex; width:max-content; animation:benefits-scroll 30s linear infinite; }
+    .benefits-group { display:flex; align-items:center; justify-content:space-around; gap:36px; min-width:100vw; padding:11px 24px; box-sizing:border-box; flex-shrink:0; }
+    .benefits-group span { white-space:nowrap; font-size:.8rem; letter-spacing:.07em; font-weight:600; }
+    .benefits-banner:hover .benefits-track { animation-play-state:paused; }
+    @keyframes benefits-scroll { to { transform:translateX(-50%); } }
+    @media(max-width:600px){ .benefits-group { gap:24px; } .benefits-group span { font-size:.73rem; } }
+    @media(prefers-reduced-motion:reduce){ .benefits-track { animation:none; width:100%; } .benefits-group { min-width:0; width:100%; flex-wrap:wrap; gap:8px; } .benefits-group[aria-hidden] { display:none; } }
+  .consult-colors-title { font:inherit; font-size:.88rem; font-weight:600; margin:24px 0 12px; }
+    .consult-colors-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .consult-colors-grid a { text-decoration:none; color:inherit; }
+    .consult-colors-grid img { object-fit:cover; border-radius:50%; flex-shrink:0; }
   </style>
 </head>
 <body>
@@ -527,7 +522,7 @@ h1, h2, h3, button, a {
 <span id="gallery-position" class="gallery-position" role="status" aria-live="polite" hidden></span>
 </div><div class="thumbs" id="thumbnails" aria-label="Fotografías del producto"></div><p class="photo-note" id="photo-note"></p></div>
         <div class="configuration">
-          <div class="product-heading"><p class="eyebrow" id="product-category"></p><h1 id="product-title" tabindex="-1"></h1><p class="intro" id="product-intro"></p><p id="old-price" class="old-price" hidden></p><p id="price" class="price" aria-live="polite"></p><div id="payment-options" class="payment-options" aria-live="polite" hidden><p id="installment-before" class="installment-before" hidden></p><p id="installment-price"></p><p id="cyber-validity" class="cyber-validity" role="timer" aria-live="off" hidden></p><p id="cash-price"></p></div><p id="price-caption" class="price-caption"></p></div>
+          <div class="product-heading"><p class="eyebrow" id="product-category"></p><h1 id="product-title" tabindex="-1"></h1><p class="intro" id="product-intro"></p><p id="old-price" class="old-price" hidden></p><p id="price" class="price" aria-live="polite"></p><div id="payment-options" class="payment-options" aria-live="polite" hidden><p id="installment-price"></p><p id="cash-price"></p></div><p id="price-caption" class="price-caption"></p></div>
           <fieldset><legend id="sizes-label"></legend><div id="sizes" class="choices"></div><!-- Los campos se dibujan desde MEDIDAS_PERSONALIZADAS; se ocultan al elegir una medida estándar. --><div id="custom-measure" class="custom-measure" hidden></div></fieldset>
           <fieldset><legend id="fabrics-label"></legend><div id="fabrics" class="choices"></div></fieldset>
           <fieldset><legend id="colors-label"></legend><p id="color-status" class="color-status"></p><div id="swatches" class="swatch-grid"></div><button id="view-samples" class="text-link" type="button" hidden></button><p id="sample-note" class="sample-note"></p></fieldset>
@@ -676,37 +671,8 @@ const MEDIDAS_PERSONALIZADAS = {
 */
 const GALERIA = { flechas: { enabled: true }, deslizar: { enabled: true } };
 
-// CYBERMONDAY: cambiar enabled a false restaura las 6 cuotas y el anuncio habitual.
-// Color, textos y cantidad de cuotas se modifican únicamente aquí.
-const CYBERMONDAY = {
-  enabled: true,
-  cuotas: 18,
-  // Jueves a las 00:00 de Argentina: ya terminó todo el miércoles.
-  fin: "2026-11-05T00:00:00-03:00",
-  contadorTexto: "Termina en", // Texto que acompaña la cuenta regresiva.
-  color: "#a43743", // Borgoña: acompaña al crema y al verde de LM.
-  mensajes: ["CYBERMONDAY", "18 cuotas sin interés", "30% OFF en efectivo o transferencia"]
-};
-// Desactiva las 18 cuotas al llegar la fecha, conservando los pagos habituales.
-function cyberActivo(ahora=Date.now()) {
-  return CYBERMONDAY.enabled && ahora < Date.parse(CYBERMONDAY.fin);
-}
-// Se actualiza cada segundo. El fin usa el huso horario de Argentina.
-function textoCuentaCyber(ahora=Date.now()) {
-  const segundos=Math.max(0,Math.floor((Date.parse(CYBERMONDAY.fin)-ahora)/1000));
-  const dias=Math.floor(segundos/86400);
-  const horas=Math.floor(segundos%86400/3600);
-  const minutos=Math.floor(segundos%3600/60);
-  const resto=segundos%60;
-  const dos=n=>String(n).padStart(2,"0");
-  return CYBERMONDAY.contadorTexto+" "+(dias ? dias+"d · " : "")+dos(horas)+"h : "+dos(minutos)+"m : "+dos(resto)+"s";
-}
-function actualizarCuentaCyber() {
-  const textoContador=textoCuentaCyber();
-  document.querySelectorAll("[data-cyber-countdown]").forEach(n=>{n.textContent=textoContador;});
-  const ficha=document.getElementById("cyber-validity");
-  if(ficha && !ficha.hidden)ficha.textContent=textoContador;
-}
+// BARRA SUPERIOR: enabled false la oculta; editá los mensajes de esta lista.
+const BARRA_BENEFICIOS={enabled:true,mensajes:["6 cuotas sin interés","30% OFF en efectivo o transferencia"]};
 const PAGOS = {
   cuotas: { enabled: true, cantidad: 6, texto: "sin interés" },
   contado: { enabled: true, porcentaje: 30, texto: "abonando en efectivo o transferencia" }
@@ -5396,6 +5362,2723 @@ Lee MARCA, INICIO, TEXTOS, CATEGORIAS y PRODUCTOS y dibuja toda la interfaz.
 Los textos ingresados se escapan para no interpretarlos como código HTML.
 No guarda datos personales, no procesa pagos y no envía mensajes por sí solo.
 */
+
+/* 08.1 NOVEDADES NOVIEMBRE — todos los datos editables de los nuevos modelos.
+   Precios finales confirmados: NO aplicar el aumento anterior del 15%.
+   FOTOS: cada fotosPorTela contiene frente, diagonal y detalle.
+   El muestrario de TELAS se añade como cuarta imagen automáticamente.
+   Para agregar fotos, copiá un objeto dentro de la lista de su tela.
+   visible:false oculta un producto. medidaPersonalizada.enabled:false la desactiva.
+   TUSOR: colores son los 4 disponibles; coloresConsulta se muestran aparte.
+*/
+TELAS['lino-aspen']={
+  "id": "lino-aspen",
+  "nombre": "Lino Aspen",
+  "muestrario": "imagenes/telas/lino-aspen.webp",
+  "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+  "colores": [
+    {
+      "id": "arena",
+      "nombre": "Arena",
+      "imagen": "imagenes/telas/muestras/lino-aspen-arena.webp"
+    },
+    {
+      "id": "antique",
+      "nombre": "Antique",
+      "imagen": "imagenes/telas/muestras/lino-aspen-antique.webp"
+    },
+    {
+      "id": "mustang",
+      "nombre": "Mustang",
+      "imagen": "imagenes/telas/muestras/lino-aspen-mustang.webp"
+    },
+    {
+      "id": "mango",
+      "nombre": "Mango",
+      "imagen": "imagenes/telas/muestras/lino-aspen-mango.webp"
+    },
+    {
+      "id": "stone",
+      "nombre": "Stone",
+      "imagen": "imagenes/telas/muestras/lino-aspen-stone.webp"
+    },
+    {
+      "id": "onyx",
+      "nombre": "Onyx",
+      "imagen": "imagenes/telas/muestras/lino-aspen-onyx.webp"
+    },
+    {
+      "id": "topo",
+      "nombre": "Topo",
+      "imagen": "imagenes/telas/muestras/lino-aspen-topo.webp"
+    },
+    {
+      "id": "acero",
+      "nombre": "Acero",
+      "imagen": "imagenes/telas/muestras/lino-aspen-acero.webp"
+    },
+    {
+      "id": "black",
+      "nombre": "Black",
+      "imagen": "imagenes/telas/muestras/lino-aspen-black.webp"
+    },
+    {
+      "id": "coral",
+      "nombre": "Coral",
+      "imagen": "imagenes/telas/muestras/lino-aspen-coral.webp"
+    },
+    {
+      "id": "blue",
+      "nombre": "Blue",
+      "imagen": "imagenes/telas/muestras/lino-aspen-blue.webp"
+    },
+    {
+      "id": "mineral",
+      "nombre": "Mineral",
+      "imagen": "imagenes/telas/muestras/lino-aspen-mineral.webp"
+    },
+    {
+      "id": "verde-ingles",
+      "nombre": "Verde inglés",
+      "imagen": "imagenes/telas/muestras/lino-aspen-verde-ingles.webp"
+    }
+  ],
+  "caracteristicas": [
+    "Trama visible de aspecto natural.",
+    "Tapizado de poliéster."
+  ],
+  "cuidados": "Consultanos el cuidado indicado para el mueble terminado."
+};
+TELAS['tusor-pesado']={
+  "id": "tusor-pesado",
+  "nombre": "Tusor Pesado",
+  "muestrario": "imagenes/telas/tusor-pesado.webp",
+  "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+  "colores": [
+    {
+      "id": "blanco",
+      "nombre": "Blanco",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-blanco.webp"
+    },
+    {
+      "id": "crudo-lavado",
+      "nombre": "Crudo lavado",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-crudo-lavado.webp"
+    },
+    {
+      "id": "arena",
+      "nombre": "Arena",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-arena.webp"
+    },
+    {
+      "id": "perla",
+      "nombre": "Perla",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-perla.webp"
+    },
+    {
+      "id": "elefante",
+      "nombre": "Elefante",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-elefante.webp"
+    },
+    {
+      "id": "cemento",
+      "nombre": "Cemento",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-cemento.webp"
+    },
+    {
+      "id": "vison",
+      "nombre": "Visón",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-vison.webp"
+    },
+    {
+      "id": "khaki",
+      "nombre": "Khaki",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-khaki.webp"
+    },
+    {
+      "id": "avellana",
+      "nombre": "Avellana",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-avellana.webp"
+    },
+    {
+      "id": "rosa-flamenco",
+      "nombre": "Rosa flamenco",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-rosa-flamenco.webp"
+    },
+    {
+      "id": "rosa-viejo",
+      "nombre": "Rosa viejo",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-rosa-viejo.webp"
+    },
+    {
+      "id": "bufalo",
+      "nombre": "Búfalo",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-bufalo.webp"
+    },
+    {
+      "id": "canela",
+      "nombre": "Canela",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-canela.webp"
+    },
+    {
+      "id": "mostaza",
+      "nombre": "Mostaza",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-mostaza.webp"
+    },
+    {
+      "id": "verde-seco",
+      "nombre": "Verde seco",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-verde-seco.webp"
+    },
+    {
+      "id": "verde-palta",
+      "nombre": "Verde palta",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-verde-palta.webp"
+    },
+    {
+      "id": "aqua",
+      "nombre": "Aqua",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-aqua.webp"
+    },
+    {
+      "id": "azul-acero",
+      "nombre": "Azul acero",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-azul-acero.webp"
+    },
+    {
+      "id": "grafito",
+      "nombre": "Grafito",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-grafito.webp"
+    },
+    {
+      "id": "negro-absoluto",
+      "nombre": "Negro absoluto",
+      "imagen": "imagenes/telas/muestras/tusor-pesado-negro-absoluto.webp"
+    }
+  ],
+  "caracteristicas": [
+    "Algodón 100% lavado y decatizado.",
+    "Funda desmontable apta para lavarropas."
+  ],
+  "cuidados": "Lavá la funda por separado siguiendo las indicaciones de LM."
+};
+CATEGORIAS.push({id:'pufs',nombre:'Pufs',icono:'puf',visible:true,imagen:'',descripcion:''});
+// Cada objeto es un producto: editá sus textos, medidas, precios y rutas aquí.
+PRODUCTOS.push(...[
+  {
+    "id": "butaca-siena",
+    "nombre": "Butaca Siena",
+    "categoria": "sillones",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Una butaca de líneas curvas y base tapizada que suma calidez a tu rincón favorito.",
+    "caracteristicas": [
+      "Diseño envolvente con base redonda tapizada.",
+      "Medidas: 70 × 70 cm y 80 cm de alto.",
+      "Disponible en Lino Aspen y Pana Cross."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino-aspen": [
+        {
+          "imagen": "assets/Novedades/butaca-siena/lino-aspen/butaca-siena-lino-aspen-01-frente.webp",
+          "titulo": "Vista de frente · Lino Aspen",
+          "alt": "Butaca Siena en Lino Aspen, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-siena/lino-aspen/butaca-siena-lino-aspen-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino Aspen",
+          "alt": "Butaca Siena en Lino Aspen, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-siena/lino-aspen/butaca-siena-lino-aspen-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino Aspen",
+          "alt": "Butaca Siena en Lino Aspen, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-cross": [
+        {
+          "imagen": "assets/Novedades/butaca-siena/pana-cross/butaca-siena-pana-cross-01-frente.webp",
+          "titulo": "Vista de frente · Pana Cross",
+          "alt": "Butaca Siena en Pana Cross, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-siena/pana-cross/butaca-siena-pana-cross-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Cross",
+          "alt": "Butaca Siena en Pana Cross, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-siena/pana-cross/butaca-siena-pana-cross-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Cross",
+          "alt": "Butaca Siena en Pana Cross, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino-aspen",
+    "medidaPersonalizada": {
+      "enabled": false
+    },
+    "medidas": [
+      {
+        "id": "estandar",
+        "nombre": "70 × 70 × 80 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino-aspen",
+        "nombre": "Lino Aspen",
+        "muestrario": "imagenes/telas/lino-aspen.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "colores": [
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-aspen-arena.webp"
+          },
+          {
+            "id": "antique",
+            "nombre": "Antique",
+            "imagen": "imagenes/telas/muestras/lino-aspen-antique.webp"
+          },
+          {
+            "id": "mustang",
+            "nombre": "Mustang",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mustang.webp"
+          },
+          {
+            "id": "mango",
+            "nombre": "Mango",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mango.webp"
+          },
+          {
+            "id": "stone",
+            "nombre": "Stone",
+            "imagen": "imagenes/telas/muestras/lino-aspen-stone.webp"
+          },
+          {
+            "id": "onyx",
+            "nombre": "Onyx",
+            "imagen": "imagenes/telas/muestras/lino-aspen-onyx.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/lino-aspen-topo.webp"
+          },
+          {
+            "id": "acero",
+            "nombre": "Acero",
+            "imagen": "imagenes/telas/muestras/lino-aspen-acero.webp"
+          },
+          {
+            "id": "black",
+            "nombre": "Black",
+            "imagen": "imagenes/telas/muestras/lino-aspen-black.webp"
+          },
+          {
+            "id": "coral",
+            "nombre": "Coral",
+            "imagen": "imagenes/telas/muestras/lino-aspen-coral.webp"
+          },
+          {
+            "id": "blue",
+            "nombre": "Blue",
+            "imagen": "imagenes/telas/muestras/lino-aspen-blue.webp"
+          },
+          {
+            "id": "mineral",
+            "nombre": "Mineral",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mineral.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/lino-aspen-verde-ingles.webp"
+          }
+        ],
+        "caracteristicas": [
+          "Trama visible de aspecto natural.",
+          "Tapizado de poliéster."
+        ],
+        "cuidados": "Consultanos el cuidado indicado para el mueble terminado."
+      },
+      {
+        "id": "pana-cross",
+        "nombre": "Pana Cross",
+        "muestrario": "imagenes/telas/pana-cross.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Pana con textura y relieve visibles.",
+          "Acabado cálido para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "cobre",
+            "nombre": "Cobre",
+            "imagen": "imagenes/telas/muestras/pana-cross-cobre.webp"
+          },
+          {
+            "id": "dorado",
+            "nombre": "Dorado",
+            "imagen": "imagenes/telas/muestras/pana-cross-dorado.webp"
+          },
+          {
+            "id": "rosa",
+            "nombre": "Rosa",
+            "imagen": "imagenes/telas/muestras/pana-cross-rosa.webp"
+          },
+          {
+            "id": "fucsia",
+            "nombre": "Fucsia",
+            "imagen": "imagenes/telas/muestras/pana-cross-fucsia.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/pana-cross-rojo.webp"
+          },
+          {
+            "id": "tinto",
+            "nombre": "Tinto",
+            "imagen": "imagenes/telas/muestras/pana-cross-tinto.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/pana-cross-azul.webp"
+          },
+          {
+            "id": "musgo",
+            "nombre": "Musgo",
+            "imagen": "imagenes/telas/muestras/pana-cross-musgo.webp"
+          },
+          {
+            "id": "verde",
+            "nombre": "Verde",
+            "imagen": "imagenes/telas/muestras/pana-cross-verde.webp"
+          },
+          {
+            "id": "violeta",
+            "nombre": "Violeta",
+            "imagen": "imagenes/telas/muestras/pana-cross-violeta.webp"
+          },
+          {
+            "id": "vainilla",
+            "nombre": "Vainilla",
+            "imagen": "imagenes/telas/muestras/pana-cross-vainilla.webp"
+          },
+          {
+            "id": "crema",
+            "nombre": "Crema",
+            "imagen": "imagenes/telas/muestras/pana-cross-crema.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-cross-beige.webp"
+          },
+          {
+            "id": "cafe-con-leche",
+            "nombre": "Café con leche",
+            "imagen": "imagenes/telas/muestras/pana-cross-cafe-con-leche.webp"
+          },
+          {
+            "id": "marron",
+            "nombre": "Marrón",
+            "imagen": "imagenes/telas/muestras/pana-cross-marron.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/pana-cross-piedra.webp"
+          },
+          {
+            "id": "vison",
+            "nombre": "Visón",
+            "imagen": "imagenes/telas/muestras/pana-cross-vison.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-cross-plata.webp"
+          },
+          {
+            "id": "onix",
+            "nombre": "Ónix",
+            "imagen": "imagenes/telas/muestras/pana-cross-onix.webp"
+          },
+          {
+            "id": "grafito",
+            "nombre": "Grafito",
+            "imagen": "imagenes/telas/muestras/pana-cross-grafito.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-cross-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos cómo tratar manchas según el tapizado elegido."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "estandar",
+        "tela": "lino-aspen",
+        "precio": 340000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "estandar",
+        "tela": "pana-cross",
+        "precio": 340000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "butaca-conrad",
+    "nombre": "Butaca Conrad",
+    "categoria": "sillones",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Una butaca de respaldo curvo y patas de madera, fácil de combinar en distintos ambientes.",
+    "caracteristicas": [
+      "Asiento acolchado y respaldo envolvente.",
+      "Patas de madera.",
+      "Medidas: 75 × 75 cm y 75 cm de alto.",
+      "Disponible en Lino Aspen y Pana Cross."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino-aspen": [
+        {
+          "imagen": "assets/Novedades/butaca-conrad/lino-aspen/butaca-conrad-lino-aspen-01-frente.webp",
+          "titulo": "Vista de frente · Lino Aspen",
+          "alt": "Butaca Conrad en Lino Aspen, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-conrad/lino-aspen/butaca-conrad-lino-aspen-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino Aspen",
+          "alt": "Butaca Conrad en Lino Aspen, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-conrad/lino-aspen/butaca-conrad-lino-aspen-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino Aspen",
+          "alt": "Butaca Conrad en Lino Aspen, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-cross": [
+        {
+          "imagen": "assets/Novedades/butaca-conrad/pana-cross/butaca-conrad-pana-cross-01-frente.webp",
+          "titulo": "Vista de frente · Pana Cross",
+          "alt": "Butaca Conrad en Pana Cross, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-conrad/pana-cross/butaca-conrad-pana-cross-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Cross",
+          "alt": "Butaca Conrad en Pana Cross, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/butaca-conrad/pana-cross/butaca-conrad-pana-cross-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Cross",
+          "alt": "Butaca Conrad en Pana Cross, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino-aspen",
+    "medidaPersonalizada": {
+      "enabled": false
+    },
+    "medidas": [
+      {
+        "id": "estandar",
+        "nombre": "75 × 75 × 75 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino-aspen",
+        "nombre": "Lino Aspen",
+        "muestrario": "imagenes/telas/lino-aspen.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "colores": [
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-aspen-arena.webp"
+          },
+          {
+            "id": "antique",
+            "nombre": "Antique",
+            "imagen": "imagenes/telas/muestras/lino-aspen-antique.webp"
+          },
+          {
+            "id": "mustang",
+            "nombre": "Mustang",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mustang.webp"
+          },
+          {
+            "id": "mango",
+            "nombre": "Mango",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mango.webp"
+          },
+          {
+            "id": "stone",
+            "nombre": "Stone",
+            "imagen": "imagenes/telas/muestras/lino-aspen-stone.webp"
+          },
+          {
+            "id": "onyx",
+            "nombre": "Onyx",
+            "imagen": "imagenes/telas/muestras/lino-aspen-onyx.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/lino-aspen-topo.webp"
+          },
+          {
+            "id": "acero",
+            "nombre": "Acero",
+            "imagen": "imagenes/telas/muestras/lino-aspen-acero.webp"
+          },
+          {
+            "id": "black",
+            "nombre": "Black",
+            "imagen": "imagenes/telas/muestras/lino-aspen-black.webp"
+          },
+          {
+            "id": "coral",
+            "nombre": "Coral",
+            "imagen": "imagenes/telas/muestras/lino-aspen-coral.webp"
+          },
+          {
+            "id": "blue",
+            "nombre": "Blue",
+            "imagen": "imagenes/telas/muestras/lino-aspen-blue.webp"
+          },
+          {
+            "id": "mineral",
+            "nombre": "Mineral",
+            "imagen": "imagenes/telas/muestras/lino-aspen-mineral.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/lino-aspen-verde-ingles.webp"
+          }
+        ],
+        "caracteristicas": [
+          "Trama visible de aspecto natural.",
+          "Tapizado de poliéster."
+        ],
+        "cuidados": "Consultanos el cuidado indicado para el mueble terminado."
+      },
+      {
+        "id": "pana-cross",
+        "nombre": "Pana Cross",
+        "muestrario": "imagenes/telas/pana-cross.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Pana con textura y relieve visibles.",
+          "Acabado cálido para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "cobre",
+            "nombre": "Cobre",
+            "imagen": "imagenes/telas/muestras/pana-cross-cobre.webp"
+          },
+          {
+            "id": "dorado",
+            "nombre": "Dorado",
+            "imagen": "imagenes/telas/muestras/pana-cross-dorado.webp"
+          },
+          {
+            "id": "rosa",
+            "nombre": "Rosa",
+            "imagen": "imagenes/telas/muestras/pana-cross-rosa.webp"
+          },
+          {
+            "id": "fucsia",
+            "nombre": "Fucsia",
+            "imagen": "imagenes/telas/muestras/pana-cross-fucsia.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/pana-cross-rojo.webp"
+          },
+          {
+            "id": "tinto",
+            "nombre": "Tinto",
+            "imagen": "imagenes/telas/muestras/pana-cross-tinto.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/pana-cross-azul.webp"
+          },
+          {
+            "id": "musgo",
+            "nombre": "Musgo",
+            "imagen": "imagenes/telas/muestras/pana-cross-musgo.webp"
+          },
+          {
+            "id": "verde",
+            "nombre": "Verde",
+            "imagen": "imagenes/telas/muestras/pana-cross-verde.webp"
+          },
+          {
+            "id": "violeta",
+            "nombre": "Violeta",
+            "imagen": "imagenes/telas/muestras/pana-cross-violeta.webp"
+          },
+          {
+            "id": "vainilla",
+            "nombre": "Vainilla",
+            "imagen": "imagenes/telas/muestras/pana-cross-vainilla.webp"
+          },
+          {
+            "id": "crema",
+            "nombre": "Crema",
+            "imagen": "imagenes/telas/muestras/pana-cross-crema.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-cross-beige.webp"
+          },
+          {
+            "id": "cafe-con-leche",
+            "nombre": "Café con leche",
+            "imagen": "imagenes/telas/muestras/pana-cross-cafe-con-leche.webp"
+          },
+          {
+            "id": "marron",
+            "nombre": "Marrón",
+            "imagen": "imagenes/telas/muestras/pana-cross-marron.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/pana-cross-piedra.webp"
+          },
+          {
+            "id": "vison",
+            "nombre": "Visón",
+            "imagen": "imagenes/telas/muestras/pana-cross-vison.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-cross-plata.webp"
+          },
+          {
+            "id": "onix",
+            "nombre": "Ónix",
+            "imagen": "imagenes/telas/muestras/pana-cross-onix.webp"
+          },
+          {
+            "id": "grafito",
+            "nombre": "Grafito",
+            "imagen": "imagenes/telas/muestras/pana-cross-grafito.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-cross-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos cómo tratar manchas según el tapizado elegido."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "estandar",
+        "tela": "lino-aspen",
+        "precio": 370000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "estandar",
+        "tela": "pana-cross",
+        "precio": 370000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "respaldo-aura",
+    "nombre": "Respaldo Aura",
+    "categoria": "respaldos",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un respaldo de esquinas superiores redondeadas y líneas suaves para darle calidez al dormitorio.",
+    "caracteristicas": [
+      "Altura estándar: 120 cm.",
+      "Sector superior acolchado de aproximadamente 60 cm; sector inferior liso sin gomaespuma.",
+      "La medida publicada corresponde al ancho.",
+      "Disponible en Lino Boss y Pana Cross."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino-boss": [
+        {
+          "imagen": "assets/Novedades/respaldo-aura/lino-boss/respaldo-aura-lino-boss-01-frente.webp",
+          "titulo": "Vista de frente · Lino Boss",
+          "alt": "Respaldo Aura en Lino Boss, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-aura/lino-boss/respaldo-aura-lino-boss-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino Boss",
+          "alt": "Respaldo Aura en Lino Boss, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-aura/lino-boss/respaldo-aura-lino-boss-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino Boss",
+          "alt": "Respaldo Aura en Lino Boss, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-cross": [
+        {
+          "imagen": "assets/Novedades/respaldo-aura/pana-cross/respaldo-aura-pana-cross-01-frente.webp",
+          "titulo": "Vista de frente · Pana Cross",
+          "alt": "Respaldo Aura en Pana Cross, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-aura/pana-cross/respaldo-aura-pana-cross-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Cross",
+          "alt": "Respaldo Aura en Pana Cross, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-aura/pana-cross/respaldo-aura-pana-cross-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Cross",
+          "alt": "Respaldo Aura en Pana Cross, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino-boss",
+    "medidaPersonalizada": {
+      "enabled": true
+    },
+    "medidas": [
+      {
+        "id": "m80",
+        "nombre": "80 cm"
+      },
+      {
+        "id": "m100",
+        "nombre": "100 cm"
+      },
+      {
+        "id": "m140",
+        "nombre": "140 cm"
+      },
+      {
+        "id": "m160",
+        "nombre": "160 cm"
+      },
+      {
+        "id": "m180",
+        "nombre": "180 cm"
+      },
+      {
+        "id": "m200",
+        "nombre": "200 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino-boss",
+        "nombre": "Lino Boss",
+        "muestrario": "imagenes/telas/lino-boss.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Tejido con tramado símil lino.",
+          "Acabado texturado para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "natural",
+            "nombre": "Natural",
+            "imagen": "imagenes/telas/muestras/lino-boss-natural.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/lino-boss-beige.webp"
+          },
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-boss-arena.webp"
+          },
+          {
+            "id": "antiguo",
+            "nombre": "Antiguo",
+            "imagen": "imagenes/telas/muestras/lino-boss-antiguo.webp"
+          },
+          {
+            "id": "cielo",
+            "nombre": "Cielo",
+            "imagen": "imagenes/telas/muestras/lino-boss-cielo.webp"
+          },
+          {
+            "id": "turquesa",
+            "nombre": "Turquesa",
+            "imagen": "imagenes/telas/muestras/lino-boss-turquesa.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/lino-boss-azul.webp"
+          },
+          {
+            "id": "lila",
+            "nombre": "Lila",
+            "imagen": "imagenes/telas/muestras/lino-boss-lila.webp"
+          },
+          {
+            "id": "uva",
+            "nombre": "Uva",
+            "imagen": "imagenes/telas/muestras/lino-boss-uva.webp"
+          },
+          {
+            "id": "ladrillo",
+            "nombre": "Ladrillo",
+            "imagen": "imagenes/telas/muestras/lino-boss-ladrillo.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/lino-boss-rojo.webp"
+          },
+          {
+            "id": "bordo",
+            "nombre": "Bordó",
+            "imagen": "imagenes/telas/muestras/lino-boss-bordo.webp"
+          },
+          {
+            "id": "mango",
+            "nombre": "Mango",
+            "imagen": "imagenes/telas/muestras/lino-boss-mango.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/lino-boss-verde-ingles.webp"
+          },
+          {
+            "id": "chocolate",
+            "nombre": "Chocolate",
+            "imagen": "imagenes/telas/muestras/lino-boss-chocolate.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/lino-boss-piedra.webp"
+          },
+          {
+            "id": "almendra",
+            "nombre": "Almendra",
+            "imagen": "imagenes/telas/muestras/lino-boss-almendra.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/lino-boss-plata.webp"
+          },
+          {
+            "id": "gris",
+            "nombre": "Gris",
+            "imagen": "imagenes/telas/muestras/lino-boss-gris.webp"
+          },
+          {
+            "id": "plomo",
+            "nombre": "Plomo",
+            "imagen": "imagenes/telas/muestras/lino-boss-plomo.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/lino-boss-negro.webp"
+          }
+        ],
+        "cuidados": "Para limpieza puntual, paño apenas húmedo y jabón neutro, sin productos abrasivos; probá antes en una zona poco visible."
+      },
+      {
+        "id": "pana-cross",
+        "nombre": "Pana Cross",
+        "muestrario": "imagenes/telas/pana-cross.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Pana con textura y relieve visibles.",
+          "Acabado cálido para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "cobre",
+            "nombre": "Cobre",
+            "imagen": "imagenes/telas/muestras/pana-cross-cobre.webp"
+          },
+          {
+            "id": "dorado",
+            "nombre": "Dorado",
+            "imagen": "imagenes/telas/muestras/pana-cross-dorado.webp"
+          },
+          {
+            "id": "rosa",
+            "nombre": "Rosa",
+            "imagen": "imagenes/telas/muestras/pana-cross-rosa.webp"
+          },
+          {
+            "id": "fucsia",
+            "nombre": "Fucsia",
+            "imagen": "imagenes/telas/muestras/pana-cross-fucsia.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/pana-cross-rojo.webp"
+          },
+          {
+            "id": "tinto",
+            "nombre": "Tinto",
+            "imagen": "imagenes/telas/muestras/pana-cross-tinto.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/pana-cross-azul.webp"
+          },
+          {
+            "id": "musgo",
+            "nombre": "Musgo",
+            "imagen": "imagenes/telas/muestras/pana-cross-musgo.webp"
+          },
+          {
+            "id": "verde",
+            "nombre": "Verde",
+            "imagen": "imagenes/telas/muestras/pana-cross-verde.webp"
+          },
+          {
+            "id": "violeta",
+            "nombre": "Violeta",
+            "imagen": "imagenes/telas/muestras/pana-cross-violeta.webp"
+          },
+          {
+            "id": "vainilla",
+            "nombre": "Vainilla",
+            "imagen": "imagenes/telas/muestras/pana-cross-vainilla.webp"
+          },
+          {
+            "id": "crema",
+            "nombre": "Crema",
+            "imagen": "imagenes/telas/muestras/pana-cross-crema.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-cross-beige.webp"
+          },
+          {
+            "id": "cafe-con-leche",
+            "nombre": "Café con leche",
+            "imagen": "imagenes/telas/muestras/pana-cross-cafe-con-leche.webp"
+          },
+          {
+            "id": "marron",
+            "nombre": "Marrón",
+            "imagen": "imagenes/telas/muestras/pana-cross-marron.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/pana-cross-piedra.webp"
+          },
+          {
+            "id": "vison",
+            "nombre": "Visón",
+            "imagen": "imagenes/telas/muestras/pana-cross-vison.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-cross-plata.webp"
+          },
+          {
+            "id": "onix",
+            "nombre": "Ónix",
+            "imagen": "imagenes/telas/muestras/pana-cross-onix.webp"
+          },
+          {
+            "id": "grafito",
+            "nombre": "Grafito",
+            "imagen": "imagenes/telas/muestras/pana-cross-grafito.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-cross-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos cómo tratar manchas según el tapizado elegido."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "m80",
+        "tela": "lino-boss",
+        "precio": 156600,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m100",
+        "tela": "lino-boss",
+        "precio": 174000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m140",
+        "tela": "lino-boss",
+        "precio": 261000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m160",
+        "tela": "lino-boss",
+        "precio": 295800,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m180",
+        "tela": "lino-boss",
+        "precio": 330600,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m200",
+        "tela": "lino-boss",
+        "precio": 348000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m80",
+        "tela": "pana-cross",
+        "precio": 182700,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m100",
+        "tela": "pana-cross",
+        "precio": 203000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m140",
+        "tela": "pana-cross",
+        "precio": 304500,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m160",
+        "tela": "pana-cross",
+        "precio": 345100,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m180",
+        "tela": "pana-cross",
+        "precio": 385700,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m200",
+        "tela": "pana-cross",
+        "precio": 426300,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "respaldo-con-funda",
+    "nombre": "Respaldo con funda",
+    "categoria": "respaldos",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un respaldo de aspecto relajado, con funda desmontable para renovar tu dormitorio y facilitar su cuidado.",
+    "caracteristicas": [
+      "Base tapizada en ecocuero blanco.",
+      "La base presenta un sector superior acolchado y otro inferior liso, separados a los 60 cm.",
+      "La funda entera cubre la separación y da una apariencia continua.",
+      "Funda desmontable de tusor pesado",
+      "100% algodón lavado y decatizado",
+      "No encoge ni se deforma",
+      "Funda apta para lavarropas"
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "tusor-pesado": [
+        {
+          "imagen": "assets/Novedades/respaldo-con-funda/tusor-pesado/respaldo-con-funda-tusor-pesado-01-frente.webp",
+          "titulo": "Vista de frente · Tusor Pesado",
+          "alt": "Respaldo con funda en Tusor Pesado, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-con-funda/tusor-pesado/respaldo-con-funda-tusor-pesado-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Tusor Pesado",
+          "alt": "Respaldo con funda en Tusor Pesado, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-con-funda/tusor-pesado/respaldo-con-funda-tusor-pesado-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Tusor Pesado",
+          "alt": "Respaldo con funda en Tusor Pesado, detalle",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-con-funda/tusor-pesado/respaldo-con-funda-sin-funda.webp",
+          "titulo": "Estructura sin funda · Ecocuero blanco",
+          "alt": "Respaldo sin funda: ecocuero blanco, mitad superior acolchada y mitad inferior lisa",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "tusor-pesado",
+    "medidaPersonalizada": {
+      "enabled": true
+    },
+    "medidas": [
+      {
+        "id": "m80",
+        "nombre": "80 cm"
+      },
+      {
+        "id": "m100",
+        "nombre": "100 cm"
+      },
+      {
+        "id": "m140",
+        "nombre": "140 cm"
+      },
+      {
+        "id": "m160",
+        "nombre": "160 cm"
+      },
+      {
+        "id": "m180",
+        "nombre": "180 cm"
+      },
+      {
+        "id": "m200",
+        "nombre": "200 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "tusor-pesado",
+        "nombre": "Tusor Pesado",
+        "muestrario": "imagenes/telas/tusor-pesado.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "colores": [
+          {
+            "id": "blanco",
+            "nombre": "Blanco",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-blanco.webp"
+          },
+          {
+            "id": "crudo-lavado",
+            "nombre": "Crudo lavado",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-crudo-lavado.webp"
+          },
+          {
+            "id": "elefante",
+            "nombre": "Elefante",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-elefante.webp"
+          },
+          {
+            "id": "grafito",
+            "nombre": "Grafito",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-grafito.webp"
+          }
+        ],
+        "caracteristicas": [
+          "Algodón 100% lavado y decatizado.",
+          "Funda desmontable apta para lavarropas."
+        ],
+        "cuidados": "Lavá la funda por separado siguiendo las indicaciones de LM.",
+        "coloresConsulta": [
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-arena.webp"
+          },
+          {
+            "id": "perla",
+            "nombre": "Perla",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-perla.webp"
+          },
+          {
+            "id": "cemento",
+            "nombre": "Cemento",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-cemento.webp"
+          },
+          {
+            "id": "vison",
+            "nombre": "Visón",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-vison.webp"
+          },
+          {
+            "id": "khaki",
+            "nombre": "Khaki",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-khaki.webp"
+          },
+          {
+            "id": "avellana",
+            "nombre": "Avellana",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-avellana.webp"
+          },
+          {
+            "id": "rosa-flamenco",
+            "nombre": "Rosa flamenco",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-rosa-flamenco.webp"
+          },
+          {
+            "id": "rosa-viejo",
+            "nombre": "Rosa viejo",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-rosa-viejo.webp"
+          },
+          {
+            "id": "bufalo",
+            "nombre": "Búfalo",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-bufalo.webp"
+          },
+          {
+            "id": "canela",
+            "nombre": "Canela",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-canela.webp"
+          },
+          {
+            "id": "mostaza",
+            "nombre": "Mostaza",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-mostaza.webp"
+          },
+          {
+            "id": "verde-seco",
+            "nombre": "Verde seco",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-verde-seco.webp"
+          },
+          {
+            "id": "verde-palta",
+            "nombre": "Verde palta",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-verde-palta.webp"
+          },
+          {
+            "id": "aqua",
+            "nombre": "Aqua",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-aqua.webp"
+          },
+          {
+            "id": "azul-acero",
+            "nombre": "Azul acero",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-azul-acero.webp"
+          },
+          {
+            "id": "negro-absoluto",
+            "nombre": "Negro absoluto",
+            "imagen": "imagenes/telas/muestras/tusor-pesado-negro-absoluto.webp"
+          }
+        ]
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "m80",
+        "tela": "tusor-pesado",
+        "precio": 172000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m100",
+        "tela": "tusor-pesado",
+        "precio": 188800,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m140",
+        "tela": "tusor-pesado",
+        "precio": 199900,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m160",
+        "tela": "tusor-pesado",
+        "precio": 235500,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m180",
+        "tela": "tusor-pesado",
+        "precio": 255100,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m200",
+        "tela": "tusor-pesado",
+        "precio": 265300,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "respaldo-diseno",
+    "nombre": "Respaldo Diseño",
+    "categoria": "respaldos",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un respaldo con un panel central amplio y tres paneles acolchados a cada lado.",
+    "caracteristicas": [
+      "Altura estándar: 120 cm.",
+      "Diseño acolchado en los 60 cm superiores y sector inferior liso sin gomaespuma.",
+      "La medida publicada corresponde al ancho.",
+      "Disponible en Lino Boss y Pana Cross."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino-boss": [
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/lino-boss/respaldo-diseno-lino-boss-01-frente.webp",
+          "titulo": "Vista de frente · Lino Boss",
+          "alt": "Respaldo Diseño en Lino Boss, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/lino-boss/respaldo-diseno-lino-boss-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino Boss",
+          "alt": "Respaldo Diseño en Lino Boss, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/lino-boss/respaldo-diseno-lino-boss-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino Boss",
+          "alt": "Respaldo Diseño en Lino Boss, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-cross": [
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/pana-cross/respaldo-diseno-pana-cross-01-frente.webp",
+          "titulo": "Vista de frente · Pana Cross",
+          "alt": "Respaldo Diseño en Pana Cross, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/pana-cross/respaldo-diseno-pana-cross-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Cross",
+          "alt": "Respaldo Diseño en Pana Cross, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/respaldo-diseno/pana-cross/respaldo-diseno-pana-cross-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Cross",
+          "alt": "Respaldo Diseño en Pana Cross, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino-boss",
+    "medidaPersonalizada": {
+      "enabled": true
+    },
+    "medidas": [
+      {
+        "id": "m80",
+        "nombre": "80 cm"
+      },
+      {
+        "id": "m100",
+        "nombre": "100 cm"
+      },
+      {
+        "id": "m140",
+        "nombre": "140 cm"
+      },
+      {
+        "id": "m160",
+        "nombre": "160 cm"
+      },
+      {
+        "id": "m180",
+        "nombre": "180 cm"
+      },
+      {
+        "id": "m200",
+        "nombre": "200 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino-boss",
+        "nombre": "Lino Boss",
+        "muestrario": "imagenes/telas/lino-boss.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Tejido con tramado símil lino.",
+          "Acabado texturado para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "natural",
+            "nombre": "Natural",
+            "imagen": "imagenes/telas/muestras/lino-boss-natural.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/lino-boss-beige.webp"
+          },
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-boss-arena.webp"
+          },
+          {
+            "id": "antiguo",
+            "nombre": "Antiguo",
+            "imagen": "imagenes/telas/muestras/lino-boss-antiguo.webp"
+          },
+          {
+            "id": "cielo",
+            "nombre": "Cielo",
+            "imagen": "imagenes/telas/muestras/lino-boss-cielo.webp"
+          },
+          {
+            "id": "turquesa",
+            "nombre": "Turquesa",
+            "imagen": "imagenes/telas/muestras/lino-boss-turquesa.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/lino-boss-azul.webp"
+          },
+          {
+            "id": "lila",
+            "nombre": "Lila",
+            "imagen": "imagenes/telas/muestras/lino-boss-lila.webp"
+          },
+          {
+            "id": "uva",
+            "nombre": "Uva",
+            "imagen": "imagenes/telas/muestras/lino-boss-uva.webp"
+          },
+          {
+            "id": "ladrillo",
+            "nombre": "Ladrillo",
+            "imagen": "imagenes/telas/muestras/lino-boss-ladrillo.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/lino-boss-rojo.webp"
+          },
+          {
+            "id": "bordo",
+            "nombre": "Bordó",
+            "imagen": "imagenes/telas/muestras/lino-boss-bordo.webp"
+          },
+          {
+            "id": "mango",
+            "nombre": "Mango",
+            "imagen": "imagenes/telas/muestras/lino-boss-mango.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/lino-boss-verde-ingles.webp"
+          },
+          {
+            "id": "chocolate",
+            "nombre": "Chocolate",
+            "imagen": "imagenes/telas/muestras/lino-boss-chocolate.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/lino-boss-piedra.webp"
+          },
+          {
+            "id": "almendra",
+            "nombre": "Almendra",
+            "imagen": "imagenes/telas/muestras/lino-boss-almendra.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/lino-boss-plata.webp"
+          },
+          {
+            "id": "gris",
+            "nombre": "Gris",
+            "imagen": "imagenes/telas/muestras/lino-boss-gris.webp"
+          },
+          {
+            "id": "plomo",
+            "nombre": "Plomo",
+            "imagen": "imagenes/telas/muestras/lino-boss-plomo.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/lino-boss-negro.webp"
+          }
+        ],
+        "cuidados": "Para limpieza puntual, paño apenas húmedo y jabón neutro, sin productos abrasivos; probá antes en una zona poco visible."
+      },
+      {
+        "id": "pana-cross",
+        "nombre": "Pana Cross",
+        "muestrario": "imagenes/telas/pana-cross.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Pana con textura y relieve visibles.",
+          "Acabado cálido para tapicería."
+        ],
+        "colores": [
+          {
+            "id": "cobre",
+            "nombre": "Cobre",
+            "imagen": "imagenes/telas/muestras/pana-cross-cobre.webp"
+          },
+          {
+            "id": "dorado",
+            "nombre": "Dorado",
+            "imagen": "imagenes/telas/muestras/pana-cross-dorado.webp"
+          },
+          {
+            "id": "rosa",
+            "nombre": "Rosa",
+            "imagen": "imagenes/telas/muestras/pana-cross-rosa.webp"
+          },
+          {
+            "id": "fucsia",
+            "nombre": "Fucsia",
+            "imagen": "imagenes/telas/muestras/pana-cross-fucsia.webp"
+          },
+          {
+            "id": "rojo",
+            "nombre": "Rojo",
+            "imagen": "imagenes/telas/muestras/pana-cross-rojo.webp"
+          },
+          {
+            "id": "tinto",
+            "nombre": "Tinto",
+            "imagen": "imagenes/telas/muestras/pana-cross-tinto.webp"
+          },
+          {
+            "id": "azul",
+            "nombre": "Azul",
+            "imagen": "imagenes/telas/muestras/pana-cross-azul.webp"
+          },
+          {
+            "id": "musgo",
+            "nombre": "Musgo",
+            "imagen": "imagenes/telas/muestras/pana-cross-musgo.webp"
+          },
+          {
+            "id": "verde",
+            "nombre": "Verde",
+            "imagen": "imagenes/telas/muestras/pana-cross-verde.webp"
+          },
+          {
+            "id": "violeta",
+            "nombre": "Violeta",
+            "imagen": "imagenes/telas/muestras/pana-cross-violeta.webp"
+          },
+          {
+            "id": "vainilla",
+            "nombre": "Vainilla",
+            "imagen": "imagenes/telas/muestras/pana-cross-vainilla.webp"
+          },
+          {
+            "id": "crema",
+            "nombre": "Crema",
+            "imagen": "imagenes/telas/muestras/pana-cross-crema.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-cross-beige.webp"
+          },
+          {
+            "id": "cafe-con-leche",
+            "nombre": "Café con leche",
+            "imagen": "imagenes/telas/muestras/pana-cross-cafe-con-leche.webp"
+          },
+          {
+            "id": "marron",
+            "nombre": "Marrón",
+            "imagen": "imagenes/telas/muestras/pana-cross-marron.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/pana-cross-piedra.webp"
+          },
+          {
+            "id": "vison",
+            "nombre": "Visón",
+            "imagen": "imagenes/telas/muestras/pana-cross-vison.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-cross-plata.webp"
+          },
+          {
+            "id": "onix",
+            "nombre": "Ónix",
+            "imagen": "imagenes/telas/muestras/pana-cross-onix.webp"
+          },
+          {
+            "id": "grafito",
+            "nombre": "Grafito",
+            "imagen": "imagenes/telas/muestras/pana-cross-grafito.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-cross-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos cómo tratar manchas según el tapizado elegido."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "m80",
+        "tela": "lino-boss",
+        "precio": 155365,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m100",
+        "tela": "lino-boss",
+        "precio": 171925,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m140",
+        "tela": "lino-boss",
+        "precio": 194695,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m160",
+        "tela": "lino-boss",
+        "precio": 206310,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m180",
+        "tela": "lino-boss",
+        "precio": 226665,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m200",
+        "tela": "lino-boss",
+        "precio": 248630,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m80",
+        "tela": "pana-cross",
+        "precio": 194465,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m100",
+        "tela": "pana-cross",
+        "precio": 211600,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m140",
+        "tela": "pana-cross",
+        "precio": 231035,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m160",
+        "tela": "pana-cross",
+        "precio": 246445,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m180",
+        "tela": "pana-cross",
+        "precio": 287730,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "m200",
+        "tela": "pana-cross",
+        "precio": 323955,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "taburete-alto",
+    "nombre": "Taburete alto",
+    "categoria": "sillas",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un taburete con asiento y respaldo tapizados, acompañado por una estructura de madera con apoyapiés.",
+    "caracteristicas": [
+      "Asiento de 40 × 40 cm.",
+      "Altura del asiento: 75 cm. Altura total con respaldo: 105 cm.",
+      "Tapizados: Lino o Pana Diva."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino": [
+        {
+          "imagen": "assets/Novedades/taburete-alto/lino/taburete-alto-lino-01-frente.webp",
+          "titulo": "Vista de frente · Lino",
+          "alt": "Taburete alto en Lino, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/taburete-alto/lino/taburete-alto-lino-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino",
+          "alt": "Taburete alto en Lino, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/taburete-alto/lino/taburete-alto-lino-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino",
+          "alt": "Taburete alto en Lino, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-diva": [
+        {
+          "imagen": "assets/Novedades/taburete-alto/pana-diva/taburete-alto-pana-diva-01-frente.webp",
+          "titulo": "Vista de frente · Pana Diva",
+          "alt": "Taburete alto en Pana Diva, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/taburete-alto/pana-diva/taburete-alto-pana-diva-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Diva",
+          "alt": "Taburete alto en Pana Diva, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/taburete-alto/pana-diva/taburete-alto-pana-diva-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Diva",
+          "alt": "Taburete alto en Pana Diva, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino",
+    "medidaPersonalizada": {
+      "enabled": false
+    },
+    "medidas": [
+      {
+        "id": "estandar",
+        "nombre": "40 × 40 cm · asiento a 75 cm · altura total 105 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino",
+        "nombre": "Lino",
+        "muestrario": "imagenes/telas/lino.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Trama visible de aspecto natural.",
+          "Textura marcada para un acabado cálido."
+        ],
+        "colores": [
+          {
+            "id": "crudo",
+            "nombre": "Crudo",
+            "imagen": "imagenes/telas/muestras/lino-crudo.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/lino-beige.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/lino-lino.webp"
+          },
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-arena.webp"
+          },
+          {
+            "id": "gamo",
+            "nombre": "Gamo",
+            "imagen": "imagenes/telas/muestras/lino-gamo.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/lino-piedra.webp"
+          },
+          {
+            "id": "gris",
+            "nombre": "Gris",
+            "imagen": "imagenes/telas/muestras/lino-gris.webp"
+          },
+          {
+            "id": "petroleo",
+            "nombre": "Petróleo",
+            "imagen": "imagenes/telas/muestras/lino-petroleo.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/lino-topo.webp"
+          }
+        ],
+        "cuidados": "Consultanos el cuidado indicado para tu tapizado antes de aplicar productos de limpieza."
+      },
+      {
+        "id": "pana-diva",
+        "nombre": "Pana Diva",
+        "muestrario": "imagenes/telas/pana-diva.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Terminación suave y aterciopelada.",
+          "Pelo corto y acabado uniforme."
+        ],
+        "colores": [
+          {
+            "id": "natural",
+            "nombre": "Natural",
+            "imagen": "imagenes/telas/muestras/pana-diva-natural.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/pana-diva-lino.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-diva-beige.webp"
+          },
+          {
+            "id": "oliva",
+            "nombre": "Oliva",
+            "imagen": "imagenes/telas/muestras/pana-diva-oliva.webp"
+          },
+          {
+            "id": "africano",
+            "nombre": "Africano",
+            "imagen": "imagenes/telas/muestras/pana-diva-africano.webp"
+          },
+          {
+            "id": "nude",
+            "nombre": "Nude",
+            "imagen": "imagenes/telas/muestras/pana-diva-nude.webp"
+          },
+          {
+            "id": "salmon",
+            "nombre": "Salmón",
+            "imagen": "imagenes/telas/muestras/pana-diva-salmon.webp"
+          },
+          {
+            "id": "rosa-viejo",
+            "nombre": "Rosa viejo",
+            "imagen": "imagenes/telas/muestras/pana-diva-rosa-viejo.webp"
+          },
+          {
+            "id": "solar",
+            "nombre": "Solar",
+            "imagen": "imagenes/telas/muestras/pana-diva-solar.webp"
+          },
+          {
+            "id": "mostaza",
+            "nombre": "Mostaza",
+            "imagen": "imagenes/telas/muestras/pana-diva-mostaza.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-diva-plata.webp"
+          },
+          {
+            "id": "aluminio",
+            "nombre": "Aluminio",
+            "imagen": "imagenes/telas/muestras/pana-diva-aluminio.webp"
+          },
+          {
+            "id": "mercurio",
+            "nombre": "Mercurio",
+            "imagen": "imagenes/telas/muestras/pana-diva-mercurio.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/pana-diva-topo.webp"
+          },
+          {
+            "id": "plomo",
+            "nombre": "Plomo",
+            "imagen": "imagenes/telas/muestras/pana-diva-plomo.webp"
+          },
+          {
+            "id": "acqua",
+            "nombre": "Acqua",
+            "imagen": "imagenes/telas/muestras/pana-diva-acqua.webp"
+          },
+          {
+            "id": "verde-ron",
+            "nombre": "Verde ron",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ron.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ingles.webp"
+          },
+          {
+            "id": "azul-aero",
+            "nombre": "Azul aero",
+            "imagen": "imagenes/telas/muestras/pana-diva-azul-aero.webp"
+          },
+          {
+            "id": "cobalto",
+            "nombre": "Cobalto",
+            "imagen": "imagenes/telas/muestras/pana-diva-cobalto.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-diva-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos las indicaciones de limpieza antes de humedecer la tela."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "estandar",
+        "tela": "lino",
+        "precio": 245000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "estandar",
+        "tela": "pana-diva",
+        "precio": 245000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "puf-redondo",
+    "nombre": "Puf redondo",
+    "categoria": "pufs",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un puf compacto de líneas redondas para sumar un asiento auxiliar a tu espacio.",
+    "caracteristicas": [
+      "Diámetro: 50 cm. Alto: 45 cm.",
+      "Base cilíndrica y asiento tapizados.",
+      "Disponible en Lino y Pana Diva."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino": [
+        {
+          "imagen": "assets/Novedades/puf-redondo/lino/puf-redondo-lino-01-frente.webp",
+          "titulo": "Vista de frente · Lino",
+          "alt": "Puf redondo en Lino, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-redondo/lino/puf-redondo-lino-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino",
+          "alt": "Puf redondo en Lino, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-redondo/lino/puf-redondo-lino-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino",
+          "alt": "Puf redondo en Lino, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-diva": [
+        {
+          "imagen": "assets/Novedades/puf-redondo/pana-diva/puf-redondo-pana-diva-01-frente.webp",
+          "titulo": "Vista de frente · Pana Diva",
+          "alt": "Puf redondo en Pana Diva, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-redondo/pana-diva/puf-redondo-pana-diva-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Diva",
+          "alt": "Puf redondo en Pana Diva, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-redondo/pana-diva/puf-redondo-pana-diva-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Diva",
+          "alt": "Puf redondo en Pana Diva, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino",
+    "medidaPersonalizada": {
+      "enabled": false
+    },
+    "medidas": [
+      {
+        "id": "estandar",
+        "nombre": "50 cm · 45 cm de alto"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino",
+        "nombre": "Lino",
+        "muestrario": "imagenes/telas/lino.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Trama visible de aspecto natural.",
+          "Textura marcada para un acabado cálido."
+        ],
+        "colores": [
+          {
+            "id": "crudo",
+            "nombre": "Crudo",
+            "imagen": "imagenes/telas/muestras/lino-crudo.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/lino-beige.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/lino-lino.webp"
+          },
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-arena.webp"
+          },
+          {
+            "id": "gamo",
+            "nombre": "Gamo",
+            "imagen": "imagenes/telas/muestras/lino-gamo.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/lino-piedra.webp"
+          },
+          {
+            "id": "gris",
+            "nombre": "Gris",
+            "imagen": "imagenes/telas/muestras/lino-gris.webp"
+          },
+          {
+            "id": "petroleo",
+            "nombre": "Petróleo",
+            "imagen": "imagenes/telas/muestras/lino-petroleo.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/lino-topo.webp"
+          }
+        ],
+        "cuidados": "Consultanos el cuidado indicado para tu tapizado antes de aplicar productos de limpieza."
+      },
+      {
+        "id": "pana-diva",
+        "nombre": "Pana Diva",
+        "muestrario": "imagenes/telas/pana-diva.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Terminación suave y aterciopelada.",
+          "Pelo corto y acabado uniforme."
+        ],
+        "colores": [
+          {
+            "id": "natural",
+            "nombre": "Natural",
+            "imagen": "imagenes/telas/muestras/pana-diva-natural.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/pana-diva-lino.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-diva-beige.webp"
+          },
+          {
+            "id": "oliva",
+            "nombre": "Oliva",
+            "imagen": "imagenes/telas/muestras/pana-diva-oliva.webp"
+          },
+          {
+            "id": "africano",
+            "nombre": "Africano",
+            "imagen": "imagenes/telas/muestras/pana-diva-africano.webp"
+          },
+          {
+            "id": "nude",
+            "nombre": "Nude",
+            "imagen": "imagenes/telas/muestras/pana-diva-nude.webp"
+          },
+          {
+            "id": "salmon",
+            "nombre": "Salmón",
+            "imagen": "imagenes/telas/muestras/pana-diva-salmon.webp"
+          },
+          {
+            "id": "rosa-viejo",
+            "nombre": "Rosa viejo",
+            "imagen": "imagenes/telas/muestras/pana-diva-rosa-viejo.webp"
+          },
+          {
+            "id": "solar",
+            "nombre": "Solar",
+            "imagen": "imagenes/telas/muestras/pana-diva-solar.webp"
+          },
+          {
+            "id": "mostaza",
+            "nombre": "Mostaza",
+            "imagen": "imagenes/telas/muestras/pana-diva-mostaza.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-diva-plata.webp"
+          },
+          {
+            "id": "aluminio",
+            "nombre": "Aluminio",
+            "imagen": "imagenes/telas/muestras/pana-diva-aluminio.webp"
+          },
+          {
+            "id": "mercurio",
+            "nombre": "Mercurio",
+            "imagen": "imagenes/telas/muestras/pana-diva-mercurio.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/pana-diva-topo.webp"
+          },
+          {
+            "id": "plomo",
+            "nombre": "Plomo",
+            "imagen": "imagenes/telas/muestras/pana-diva-plomo.webp"
+          },
+          {
+            "id": "acqua",
+            "nombre": "Acqua",
+            "imagen": "imagenes/telas/muestras/pana-diva-acqua.webp"
+          },
+          {
+            "id": "verde-ron",
+            "nombre": "Verde ron",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ron.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ingles.webp"
+          },
+          {
+            "id": "azul-aero",
+            "nombre": "Azul aero",
+            "imagen": "imagenes/telas/muestras/pana-diva-azul-aero.webp"
+          },
+          {
+            "id": "cobalto",
+            "nombre": "Cobalto",
+            "imagen": "imagenes/telas/muestras/pana-diva-cobalto.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-diva-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos las indicaciones de limpieza antes de humedecer la tela."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "estandar",
+        "tela": "lino",
+        "precio": 165500,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "estandar",
+        "tela": "pana-diva",
+        "precio": 165500,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  },
+  {
+    "id": "puf-cuadrado",
+    "nombre": "Puf cuadrado",
+    "categoria": "pufs",
+    "visible": true,
+    "destacado": false,
+    "descripcionBreve": "Fabricado a pedido.",
+    "descripcion": "Un asiento auxiliar compacto, con tapizado acolchado y patas de madera.",
+    "caracteristicas": [
+      "Medidas: 40 × 40 × 40 cm.",
+      "Asiento tapizado y patas de madera.",
+      "Disponible en Lino y Pana Diva."
+    ],
+    "fotos": [],
+    "fotosPorTela": {
+      "lino": [
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/lino/puf-cuadrado-lino-01-frente.webp",
+          "titulo": "Vista de frente · Lino",
+          "alt": "Puf cuadrado en Lino, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/lino/puf-cuadrado-lino-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Lino",
+          "alt": "Puf cuadrado en Lino, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/lino/puf-cuadrado-lino-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Lino",
+          "alt": "Puf cuadrado en Lino, detalle",
+          "tipo": "producto"
+        }
+      ],
+      "pana-diva": [
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/pana-diva/puf-cuadrado-pana-diva-01-frente.webp",
+          "titulo": "Vista de frente · Pana Diva",
+          "alt": "Puf cuadrado en Pana Diva, frente",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/pana-diva/puf-cuadrado-pana-diva-02-diagonal.webp",
+          "titulo": "Vista en diagonal · Pana Diva",
+          "alt": "Puf cuadrado en Pana Diva, diagonal",
+          "tipo": "producto"
+        },
+        {
+          "imagen": "assets/Novedades/puf-cuadrado/pana-diva/puf-cuadrado-pana-diva-03-detalle.webp",
+          "titulo": "Detalle del tapizado · Pana Diva",
+          "alt": "Puf cuadrado en Pana Diva, detalle",
+          "tipo": "producto"
+        }
+      ]
+    },
+    "telaPortada": "lino",
+    "medidaPersonalizada": {
+      "enabled": false
+    },
+    "medidas": [
+      {
+        "id": "estandar",
+        "nombre": "40 × 40 × 40 cm"
+      }
+    ],
+    "telas": [
+      {
+        "id": "lino",
+        "nombre": "Lino",
+        "muestrario": "imagenes/telas/lino.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Trama visible de aspecto natural.",
+          "Textura marcada para un acabado cálido."
+        ],
+        "colores": [
+          {
+            "id": "crudo",
+            "nombre": "Crudo",
+            "imagen": "imagenes/telas/muestras/lino-crudo.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/lino-beige.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/lino-lino.webp"
+          },
+          {
+            "id": "arena",
+            "nombre": "Arena",
+            "imagen": "imagenes/telas/muestras/lino-arena.webp"
+          },
+          {
+            "id": "gamo",
+            "nombre": "Gamo",
+            "imagen": "imagenes/telas/muestras/lino-gamo.webp"
+          },
+          {
+            "id": "piedra",
+            "nombre": "Piedra",
+            "imagen": "imagenes/telas/muestras/lino-piedra.webp"
+          },
+          {
+            "id": "gris",
+            "nombre": "Gris",
+            "imagen": "imagenes/telas/muestras/lino-gris.webp"
+          },
+          {
+            "id": "petroleo",
+            "nombre": "Petróleo",
+            "imagen": "imagenes/telas/muestras/lino-petroleo.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/lino-topo.webp"
+          }
+        ],
+        "cuidados": "Consultanos el cuidado indicado para tu tapizado antes de aplicar productos de limpieza."
+      },
+      {
+        "id": "pana-diva",
+        "nombre": "Pana Diva",
+        "muestrario": "imagenes/telas/pana-diva.webp",
+        "nota": "Los tonos pueden variar según la pantalla. Consultá las muestras de tela antes de confirmar tu pedido.",
+        "caracteristicas": [
+          "Terminación suave y aterciopelada.",
+          "Pelo corto y acabado uniforme."
+        ],
+        "colores": [
+          {
+            "id": "natural",
+            "nombre": "Natural",
+            "imagen": "imagenes/telas/muestras/pana-diva-natural.webp"
+          },
+          {
+            "id": "lino",
+            "nombre": "Lino",
+            "imagen": "imagenes/telas/muestras/pana-diva-lino.webp"
+          },
+          {
+            "id": "beige",
+            "nombre": "Beige",
+            "imagen": "imagenes/telas/muestras/pana-diva-beige.webp"
+          },
+          {
+            "id": "oliva",
+            "nombre": "Oliva",
+            "imagen": "imagenes/telas/muestras/pana-diva-oliva.webp"
+          },
+          {
+            "id": "africano",
+            "nombre": "Africano",
+            "imagen": "imagenes/telas/muestras/pana-diva-africano.webp"
+          },
+          {
+            "id": "nude",
+            "nombre": "Nude",
+            "imagen": "imagenes/telas/muestras/pana-diva-nude.webp"
+          },
+          {
+            "id": "salmon",
+            "nombre": "Salmón",
+            "imagen": "imagenes/telas/muestras/pana-diva-salmon.webp"
+          },
+          {
+            "id": "rosa-viejo",
+            "nombre": "Rosa viejo",
+            "imagen": "imagenes/telas/muestras/pana-diva-rosa-viejo.webp"
+          },
+          {
+            "id": "solar",
+            "nombre": "Solar",
+            "imagen": "imagenes/telas/muestras/pana-diva-solar.webp"
+          },
+          {
+            "id": "mostaza",
+            "nombre": "Mostaza",
+            "imagen": "imagenes/telas/muestras/pana-diva-mostaza.webp"
+          },
+          {
+            "id": "plata",
+            "nombre": "Plata",
+            "imagen": "imagenes/telas/muestras/pana-diva-plata.webp"
+          },
+          {
+            "id": "aluminio",
+            "nombre": "Aluminio",
+            "imagen": "imagenes/telas/muestras/pana-diva-aluminio.webp"
+          },
+          {
+            "id": "mercurio",
+            "nombre": "Mercurio",
+            "imagen": "imagenes/telas/muestras/pana-diva-mercurio.webp"
+          },
+          {
+            "id": "topo",
+            "nombre": "Topo",
+            "imagen": "imagenes/telas/muestras/pana-diva-topo.webp"
+          },
+          {
+            "id": "plomo",
+            "nombre": "Plomo",
+            "imagen": "imagenes/telas/muestras/pana-diva-plomo.webp"
+          },
+          {
+            "id": "acqua",
+            "nombre": "Acqua",
+            "imagen": "imagenes/telas/muestras/pana-diva-acqua.webp"
+          },
+          {
+            "id": "verde-ron",
+            "nombre": "Verde ron",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ron.webp"
+          },
+          {
+            "id": "verde-ingles",
+            "nombre": "Verde inglés",
+            "imagen": "imagenes/telas/muestras/pana-diva-verde-ingles.webp"
+          },
+          {
+            "id": "azul-aero",
+            "nombre": "Azul aero",
+            "imagen": "imagenes/telas/muestras/pana-diva-azul-aero.webp"
+          },
+          {
+            "id": "cobalto",
+            "nombre": "Cobalto",
+            "imagen": "imagenes/telas/muestras/pana-diva-cobalto.webp"
+          },
+          {
+            "id": "negro",
+            "nombre": "Negro",
+            "imagen": "imagenes/telas/muestras/pana-diva-negro.webp"
+          }
+        ],
+        "cuidados": "Retirá el polvo con suavidad y consultanos las indicaciones de limpieza antes de humedecer la tela."
+      }
+    ],
+    "variantes": [
+      {
+        "medida": "estandar",
+        "tela": "lino",
+        "precio": 158000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      },
+      {
+        "medida": "estandar",
+        "tela": "pana-diva",
+        "precio": 158000,
+        "promocion": null,
+        "disponible": true,
+        "preciosPorColor": {},
+        "coloresNoDisponibles": []
+      }
+    ],
+    "pendientes": [],
+    "fuente": []
+  }
+]);
+
+// SILLÓN NUBE — nueva medida. Precio FINAL, sin recargos adicionales.
+// Editá esta variante o agregá otra medida/variante con el mismo identificador.
+{
+  const nube=PRODUCTOS.find(p=>p.id==='sillon-nube');
+  nube.medidas.unshift({id:'m200x160',nombre:'200 × 160 cm'});
+  nube.variantes.unshift({medida:'m200x160',tela:'pana-million',precio:2580000,promocion:null,disponible:true,preciosPorColor:{},coloresNoDisponibles:[]});
+  nube.caracteristicas=nube.caracteristicas.map(c=>c.startsWith('Medida de 220')?'Medidas disponibles: 200 × 160 cm y 220 × 180 cm.':c);
+}
 const $ = id => document.getElementById(id);
 const escapar = valor => String(valor ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const normalizar = texto => String(texto).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -5422,6 +8105,7 @@ function iconoCategoria(tipo) {
     sillon: '<path d="M13 28V15a5 5 0 0 1 5-5h28a5 5 0 0 1 5 5v13M12 43h40M32 18v17M17 35h30"/><path d="M7 30a5 5 0 0 1 10 0v5h30v-5a5 5 0 0 1 10 0v18H7zM13 48v7M51 48v7"/>',
     respaldo: '<path d="M10 32V13a5 5 0 0 1 5-5h34a5 5 0 0 1 5 5v19M7 52V37a5 5 0 0 1 5-5h40a5 5 0 0 1 5 5v15M7 45h50M12 52v5M52 52v5M18 14v11M32 14v11M46 14v11"/>',
     baul: '<path d="M7 30V24c0-6 4-10 10-10h30c6 0 10 4 10 10v6Z"/><rect x="7" y="30" width="50" height="20" rx="2"/><path d="M11 50v4h6v-4M47 50v4h6v-4M12 17l9 7 11-9 11 9 9-7M12 28l9-4 11 6 11-6 9 4"/><circle cx="21" cy="24" r="1" fill="currentColor"/><circle cx="43" cy="24" r="1" fill="currentColor"/>',
+    puf: '<path d="M12 26c0-8 40-8 40 0v21c0 8-40 8-40 0Z"/><ellipse cx="32" cy="26" rx="20" ry="7"/>',
     todos: '<rect x="9" y="9" width="18" height="18" rx="2"/><rect x="37" y="9" width="18" height="18" rx="2"/><rect x="9" y="37" width="18" height="18" rx="2"/><rect x="37" y="37" width="18" height="18" rx="2"/>',
     mueble: '<rect x="9" y="12" width="46" height="36" rx="4"/><path d="M15 48v8M49 48v8M32 12v36M25 26v7M39 26v7"/>'
   };
@@ -5577,12 +8261,10 @@ function iniciarSitio() {
   $("logo").src = rutaSegura(MARCA.logo);
   $("logo").alt = "Logo " + MARCA.nombre;
   texto("anuncio", INICIO.anuncio); $("anuncio").hidden = !SECCIONES.anuncio;
-  if(cyberActivo()){
-    document.documentElement.style.setProperty("--cyber",CYBERMONDAY.color);
-    const anuncio=$("anuncio"); anuncio.hidden=false; anuncio.classList.add("cyber-banner");
-    // Dos grupos idénticos hacen que la cinta avance sin saltos. Solo uno es accesible.
-    const grupo=CYBERMONDAY.mensajes.map(m=>'<span>'+escapar(m)+'</span><span class="cyber-star" aria-hidden="true">✦</span>').join('')+'<span data-cyber-countdown role="timer" aria-live="off">'+escapar(textoCuentaCyber())+'</span><span class="cyber-star" aria-hidden="true">✦</span>';
-    anuncio.innerHTML='<div class="cyber-track"><div class="cyber-group">'+grupo+'</div><div class="cyber-group" aria-hidden="true">'+grupo+'</div></div>';
+  if(BARRA_BENEFICIOS.enabled){
+    const anuncio=$("anuncio"); anuncio.hidden=false; anuncio.classList.add("benefits-banner");
+    const grupo=BARRA_BENEFICIOS.mensajes.map(m=>'<span>'+escapar(m)+'</span><span aria-hidden="true">✦</span>').join('');
+    anuncio.innerHTML='<div class="benefits-track"><div class="benefits-group">'+grupo+'</div><div class="benefits-group" aria-hidden="true">'+grupo+'</div></div>';
   }
   texto("hero-eyebrow", INICIO.etiqueta);
   $("hero-title").innerHTML = escapar(INICIO.titulo) + "<br><em>" + escapar(INICIO.tituloCursiva) + "</em>";
@@ -5847,6 +8529,11 @@ function dibujarOpciones() {
     } else if (/^#[0-9a-f]{3,8}$/i.test(color.hex || "")) muestra.style.backgroundColor = color.hex;
     else muestra.hidden = true;
   }
+  // Los tonos a consultar no se confunden con el stock disponible ni modifican el precio.
+  let extras=$("consult-colors");
+  if(!extras){ extras=document.createElement("div"); extras.id="consult-colors"; $("swatches").after(extras); }
+  extras.hidden=!(tela?.coloresConsulta?.length);
+  extras.innerHTML=tela?.coloresConsulta?.length ? '<h3 class="consult-colors-title">Consultá por estos colores</h3><div class="consult-colors-grid">'+tela.coloresConsulta.map(c=>'<a class="swatch" aria-label="Consultar disponibilidad de '+escapar(c.nombre)+'" href="https://wa.me/'+MARCA.whatsapp+'?text='+encodeURIComponent('Hola, quisiera consultar disponibilidad de '+c.nombre+' en Tusor Pesado para el Respaldo con funda.')+'" target="_blank" rel="noopener noreferrer"><img class="sample" src="'+escapar(c.imagen)+'" alt="" width="28" height="28"><span>'+escapar(c.nombre)+'</span></a>').join('')+'</div>' : '';
   texto("color-status", tela?.colores.length ? (tela.colores.find(c => c.id === estado.color)?.nombre || TEXTOS.ficha.sinColor) : TEXTOS.ficha.sinColores);
   texto("sample-note",tela?.nota || "");
   $("view-samples").hidden = !rutaSegura(tela?.muestrario);
@@ -5877,7 +8564,7 @@ function opcionesPago(seleccion) {
   const precio=seleccion.precioNumerico;
   if(!precioValido(precio))return {cuotas:'',contado:''};
   const desde=seleccion.desde ? 'Desde ' : '';
-  const q={...PAGOS.cuotas,cantidad:cyberActivo() ? CYBERMONDAY.cuotas : PAGOS.cuotas.cantidad},d=PAGOS.contado;
+  const q=PAGOS.cuotas,d=PAGOS.contado;
   return {
     cuotas:q.enabled && Number.isInteger(q.cantidad) && q.cantidad>0 ? desde+q.cantidad+' × '+dineroPago(precio/q.cantidad)+' '+q.texto : '',
     contado:d.enabled && Number.isFinite(d.porcentaje) && d.porcentaje>0 && d.porcentaje<100 ? d.porcentaje+'% OFF '+d.texto+' · '+desde+dineroPago(precio*(1-d.porcentaje/100)) : ''
@@ -5887,15 +8574,6 @@ function actualizarResumen() {
   const s = seleccionActual(); texto("price",s.precio);
   const pagos=opcionesPago(s);
   texto("installment-price",pagos.cuotas);texto("cash-price",pagos.contado);
-  // El beneficio habitual se tacha; el importe vigente siempre se calcula con 18 cuotas.
-  const vigencia=$("cyber-validity");
-  vigencia.hidden=!cyberActivo() || !pagos.cuotas;
-  vigencia.textContent=vigencia.hidden ? "" : textoCuentaCyber();
-  const anterior=$("installment-before");
-  anterior.hidden=!cyberActivo() || !pagos.cuotas;
-  anterior.textContent=anterior.hidden ? "" : PAGOS.cuotas.cantidad+" cuotas sin interés";
-  $("installment-price").classList.toggle("cyber-installment",cyberActivo());
-  $("cash-price").classList.toggle("cyber-cash",cyberActivo());
   $("installment-price").hidden=!pagos.cuotas;$("cash-price").hidden=!pagos.contado;
   $("payment-options").hidden=!pagos.cuotas && !pagos.contado;
   $("old-price").hidden = s.anterior === null;
@@ -6115,13 +8793,6 @@ if (document.modelContext?.registerTool) {
 }
 
 
-// Actualiza la cinta y la ficha; al vencer, restaura el sitio incluso si quedó abierto.
-if(cyberActivo()) {
-  const controlCyber=setInterval(()=>{
-    if(!cyberActivo()){ clearInterval(controlCyber); location.reload(); return; }
-    actualizarCuentaCyber();
-  },1000);
-}
 </script>
 </body>
 </html>
