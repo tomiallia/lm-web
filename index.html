@@ -453,6 +453,26 @@ h1, h2, h3, button, a {
     .consult-colors-grid a { text-decoration:none; color:inherit; }
     .consult-colors-grid img { object-fit:cover; border-radius:50%; flex-shrink:0; }
   </style>
+  <script>
+  if ("scrollRestoration" in history) {
+    history.scrollRestoration = "manual";
+  }
+
+  function arrancarDesdeArriba() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "instant"
+        });
+      });
+    });
+  }
+
+  window.addEventListener("load", arrancarDesdeArriba);
+  window.addEventListener("pageshow", arrancarDesdeArriba);
+</script>
 </head>
 <body>
   <!-- 02. ESTRUCTURA HTML. Para reordenar secciones, mové su bloque completo.
